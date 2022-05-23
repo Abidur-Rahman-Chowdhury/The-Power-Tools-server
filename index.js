@@ -40,13 +40,46 @@ async function run() {
     try {
         await client.connect();
         const userCollection = client.db('the_power_tools').collection('users');
+        const profileCollection = client.db('the_power_tools').collection('profile');
         console.log('Connected to MongoDB');	
         
-       
+    //    verify admin
+    const verifyAdmin = async (req, res, next) => {
+        const requester = req.decoded.email;
+        const requesterAccount = await userCollection.findOne({ email: requester });
+        if (requesterAccount.role === 'admin') {
+          next();
+        }
+        else {
+          res.status(403).send({ message: 'forbidden' });
+        }
+      }
+
+
+
+        //check user Admin or not
+        app.get('/admin/:email', async (req, res) => {
+            const email = req.params.email;
+            const user = await userCollection.findOne({ email: email });
+            const isAdmin = user.role === 'admin';
+            res.send({ admin: isAdmin })
+        })
+        
+        app.put('/user/admin/:email', tokenVerify, verifyAdmin, async (req, res) => {
+            const email = req.params.email;
+            const filter = { email: email };
+            const updateDoc = {
+              $set: { role: 'admin' },
+            };
+            const result = await userCollection.updateOne(filter, updateDoc);
+            res.send(result);
+          })
+
         // create user and secure API with jwt
         app.put('/user/:email', async (req, res) => {
             const email = req.params.email;
             const user = req.body;
+          
             const filter = { email: email };
             const options = { upsert: true };
             const updateDoc = {
@@ -55,7 +88,24 @@ async function run() {
             const result = await userCollection.updateOne(filter, updateDoc, options);
             const token = jwt.sign({ email: email }, process.env.ACCESS_TOKEN_SECRET, { expiresIn: '1d' })
             res.send({ result, token });
-          });
+        });
+      
+      // set profile data to mongodb
+      app.put('/profile/:email', async (req, res) => {
+        const email = req.params.email;
+        const user = req.body;
+          console.log(user);
+            const filter = { email: email };
+            const options = { upsert: true };
+            const updateDoc = {
+              $set: user,
+            };
+            const result = await profileCollection.updateOne(filter, updateDoc, options);
+
+        res.send(result);
+      })
+
+     
         
     }
     finally {
