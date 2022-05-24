@@ -41,6 +41,7 @@ async function run() {
         await client.connect();
         const userCollection = client.db('the_power_tools').collection('users');
         const profileCollection = client.db('the_power_tools').collection('profile');
+        const toolsCollection = client.db('the_power_tools').collection('tools');
         console.log('Connected to MongoDB');	
         
     //    verify admin
@@ -94,7 +95,6 @@ async function run() {
       app.put('/profile/:email', async (req, res) => {
         const email = req.params.email;
         const user = req.body;
-          console.log(user);
             const filter = { email: email };
             const options = { upsert: true };
             const updateDoc = {
@@ -110,6 +110,13 @@ async function run() {
         const email = req.params.email;
         const query = { email: email };
         const result = await profileCollection.findOne(query);
+        res.send(result);
+      })
+
+      // get tools
+      app.get('/tools', async (req, res) => {
+        const query = {};
+        const result = await toolsCollection.find(query).toArray();
         res.send(result);
       })
         
