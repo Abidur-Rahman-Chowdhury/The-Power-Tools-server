@@ -42,6 +42,7 @@ async function run() {
         const userCollection = client.db('the_power_tools').collection('users');
         const profileCollection = client.db('the_power_tools').collection('profile');
         const toolsCollection = client.db('the_power_tools').collection('tools');
+        const reviewCollection = client.db('the_power_tools').collection('reviews');
         console.log('Connected to MongoDB');	
         
     //    verify admin
@@ -124,7 +125,19 @@ async function run() {
         const result = await toolsCollection.insertOne(tools);
         res.send(result);
       })
-        
+        // add review to server
+      
+      app.post('/reviews' ,tokenVerify, async (req, res) => {
+        const reviews = req.body;
+        const result = await reviewCollection.insertOne(reviews);
+        res.send(result);
+      })
+      // get reviews 
+      app.get('/reviews' , async (req, res) => {
+        const query = {};
+        const result = await reviewCollection.find(query).toArray();
+        res.send(result);
+      })
     }
     finally {
 
