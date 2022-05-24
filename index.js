@@ -67,7 +67,12 @@ async function run() {
             const isAdmin = user.role === 'admin';
             res.send({ admin: isAdmin })
         })
-        
+      //  get all user
+        app.get('/user', tokenVerify, async (req, res) => {
+          const users = await userCollection.find().toArray();
+          res.send(users);
+        });
+        // make admin
         app.put('/user/admin/:email', tokenVerify, verifyAdmin, async (req, res) => {
             const email = req.params.email;
             const filter = { email: email };
@@ -133,7 +138,7 @@ async function run() {
         const id = req.params.id;
         const filter = { _id: ObjectId(id) };
         const result = await toolsCollection.findOne(filter);
-        console.log(result);
+        
         res.send(result);
       })
         // add review to server
