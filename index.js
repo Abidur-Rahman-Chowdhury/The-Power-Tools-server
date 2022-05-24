@@ -119,6 +119,11 @@ async function run() {
         const result = await toolsCollection.find(query).toArray();
         res.send(result);
       })
+      app.post('/tools', tokenVerify,verifyAdmin, async (req, res) => {
+        const tools = req.body;
+        const result = await toolsCollection.insertOne(tools);
+        res.send(result);
+      })
         
     }
     finally {
