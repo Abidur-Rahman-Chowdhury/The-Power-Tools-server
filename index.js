@@ -1,7 +1,8 @@
 const express = require('express');
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
+const req = require('express/lib/request');
 const app = express();
 const port = process.env.PORT || 5000;
 require('dotenv').config();	
@@ -120,9 +121,19 @@ async function run() {
         const result = await toolsCollection.find(query).toArray();
         res.send(result);
       })
+      // post tools
       app.post('/tools', tokenVerify,verifyAdmin, async (req, res) => {
         const tools = req.body;
         const result = await toolsCollection.insertOne(tools);
+        res.send(result);
+      })
+      // get tools by id
+
+      app.get('/tools/:id', tokenVerify, async (req, res) => {
+        const id = req.params.id;
+        const filter = { _id: ObjectId(id) };
+        const result = await toolsCollection.findOne(filter);
+        console.log(result);
         res.send(result);
       })
         // add review to server
