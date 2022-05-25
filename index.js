@@ -3,9 +3,11 @@ const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const cors = require('cors');
 const jwt = require('jsonwebtoken');
 const req = require('express/lib/request');
+
 const app = express();
 const port = process.env.PORT || 5000;
 require('dotenv').config();
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 // middleware
 
 app.use(cors());
@@ -77,23 +79,29 @@ async function run() {
     })
     
     // booking payment
-    app.patch('/booking/:id', tokenVerify, async(req, res) =>{
+    app.patch('/payment/:id', tokenVerify, async(req, res) =>{
       const id = req.params.id;
-      console.log(id);
+      
       const payment = req.body;
       const filter = {_id: ObjectId(id)};
       const updatedDoc = {
         $set: {
-          paid: true,
+          status: true,
           transactionId: payment.transactionId
         }
       }
 
-      const result = await paymentCollection.insertOne(payment);
-      const updatedBooking = await bookingCollection.updateOne(filter, updatedDoc);
-      res.send(updatedBooking);
+      // const result = await paymentCollection.insertOne(payment);
+      const updatedOrder = await orderCollection.updateOne(filter, updatedDoc);
+      res.send(updatedOrder);
     })
-
+    // get orders by id
+    app.get('/order/:id', tokenVerify, async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: ObjectId(id) }
+      const result = await orderCollection.findOne(query);
+      res.send(result)
+    })
 
     //  get tools 
     app.get('/tools/:id', tokenVerify, async (req, res) => {
