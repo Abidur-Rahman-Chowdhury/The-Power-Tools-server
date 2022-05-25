@@ -61,6 +61,40 @@ async function run() {
         res.status(403).send({ message: 'forbidden' });
       }
     };
+    //   payment api
+    app.post('/create-payment-intents', tokenVerify, async (req, res) => {
+      const service = req.body;
+      const price = service.price;
+      const amount = price * 100;
+
+      const paymentIntent = await stripe.paymentIntents.create({
+          amount: amount,
+          currency: 'usd',
+          payment_method_types: ['card']
+
+      });
+      res.send({clientSecret: paymentIntent.client_secret})
+    })
+    
+    // booking payment
+    app.patch('/booking/:id', tokenVerify, async(req, res) =>{
+      const id = req.params.id;
+      console.log(id);
+      const payment = req.body;
+      const filter = {_id: ObjectId(id)};
+      const updatedDoc = {
+        $set: {
+          paid: true,
+          transactionId: payment.transactionId
+        }
+      }
+
+      const result = await paymentCollection.insertOne(payment);
+      const updatedBooking = await bookingCollection.updateOne(filter, updatedDoc);
+      res.send(updatedBooking);
+    })
+
+
     //  get tools 
     app.get('/tools/:id', tokenVerify, async (req, res) => {
       const id = req.params.id;
