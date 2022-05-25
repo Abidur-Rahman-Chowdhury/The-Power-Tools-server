@@ -72,6 +72,13 @@ async function run() {
           const users = await userCollection.find().toArray();
           res.send(users);
         });
+      // delete user
+        app.delete('/user/:id', tokenVerify, verifyAdmin, async (req, res) => {
+          const id = req.params.id;
+          const filter = { _id: ObjectId(id) };
+          const result = await userCollection.deleteOne(filter);
+          res.send(result);
+        });
         // make admin
         app.put('/user/admin/:email', tokenVerify, verifyAdmin, async (req, res) => {
             const email = req.params.email;
