@@ -141,6 +141,14 @@ async function run() {
         
         res.send(result);
       })
+      // delete tools by id
+      app.delete('/tools/:id', tokenVerify,verifyAdmin, async (req, res) => {
+        const id = req.params.id;
+        const filter = { _id: ObjectId(id) };
+        const result = await toolsCollection.deleteOne(filter);
+        
+        res.send(result);
+      })
         // add review to server
       
       app.post('/reviews' ,tokenVerify, async (req, res) => {
