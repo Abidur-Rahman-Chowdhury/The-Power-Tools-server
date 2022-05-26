@@ -5,8 +5,9 @@ const jwt = require('jsonwebtoken');
 const req = require('express/lib/request');
 
 const app = express();
-const port = process.env.PORT || 5000;
+
 require('dotenv').config();
+const port = process.env.PORT || 5000;
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 // middleware
 
