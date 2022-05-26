@@ -103,6 +103,15 @@ async function run() {
       res.send(result)
     })
 
+    // cancel order by id
+
+    app.delete('/cancel/:id', tokenVerify, async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) }
+      const result = await orderCollection.deleteOne(filter);
+      res.send(result);
+    })
+
     //  get tools 
     app.get('/tools/:id', tokenVerify, async (req, res) => {
       const id = req.params.id;
