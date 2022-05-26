@@ -91,7 +91,7 @@ async function run() {
         }
       }
 
-      // const result = await paymentCollection.insertOne(payment);
+      
       const updatedOrder = await orderCollection.updateOne(filter, updatedDoc);
       res.send(updatedOrder);
     })
