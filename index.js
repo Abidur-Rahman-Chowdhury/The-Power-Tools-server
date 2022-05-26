@@ -95,6 +95,19 @@ async function run() {
       const updatedOrder = await orderCollection.updateOne(filter, updatedDoc);
       res.send(updatedOrder);
     })
+    // update shift status on order collection
+    app.patch('/shift/order/:id', tokenVerify, verifyAdmin, async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) };
+      const updatedDoc = {
+        $set: {
+          shift: true,
+        }
+      }
+
+      const updateShift = await orderCollection.updateOne(filter, updatedDoc);
+      res.send(updateShift);
+    })
     // get orders by id
     app.get('/order/:id', tokenVerify, async (req, res) => {
       const id = req.params.id;
@@ -109,6 +122,12 @@ async function run() {
       const id = req.params.id;
       const filter = { _id: ObjectId(id) }
       const result = await orderCollection.deleteOne(filter);
+      res.send(result);
+    })
+    // get all orders for manage all orders
+    app.get('/get/orders', tokenVerify, verifyAdmin, async (req, res) => {
+      const query = {};
+      const result = await orderCollection.find(query).toArray();
       res.send(result);
     })
 
