@@ -116,6 +116,15 @@ async function run() {
       res.send(result)
     })
 
+    // cancel order by admin
+
+    app.delete('/cancel/order/:id', tokenVerify, verifyAdmin, async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: ObjectId(id) }
+      const result = await orderCollection.deleteOne(filter);
+      res.send(result);
+    })
+
     // cancel order by id
 
     app.delete('/cancel/:id', tokenVerify, async (req, res) => {
